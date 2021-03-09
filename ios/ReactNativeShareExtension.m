@@ -1,6 +1,11 @@
-#import "ReactNativeShareExtension.h"
 #import "React/RCTRootView.h"
 #import <MobileCoreServices/MobileCoreServices.h>
+
+#if __has_include(<React/RCTUtilsUIOverride.h>)
+    #import <React/RCTUtilsUIOverride.h>
+#endif
+
+#import "ReactNativeShareExtension.h"
 
 #define URL_IDENTIFIER @"public.url"
 #define IMAGE_IDENTIFIER @"public.image"
@@ -35,7 +40,11 @@ RCT_EXPORT_MODULE();
     if (rootView.backgroundColor == nil) {
         rootView.backgroundColor = [[UIColor alloc] initWithRed:1 green:1 blue:1 alpha:0.1];
     }
-
+    
+    #if __has_include(<React/RCTUtilsUIOverride.h>)
+        [RCTUtilsUIOverride setPresentedViewController:self];
+    #endif
+    
     self.view = rootView;
 }
 
