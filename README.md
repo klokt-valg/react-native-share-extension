@@ -1,5 +1,8 @@
 # React Native Share Extension
 
+*This is a fork of [alinz/react-native-share-extension](https://github.com/alinz/react-native-share-extension).*
+
+
 This is a helper module which brings react native as an engine to drive share extension for your app.
 
 <p align="center">
@@ -571,3 +574,88 @@ Using the iOS Simulator and remote react-native debugger to develop the extensio
 I have used `react-native-modalbox` module to handle the showing and hiding share extension which makes the experience more enjoyable for the user.
 
 Cheers
+
+# Changes to the original `alinz/react-native-share-extension`
+
+## Cocoapod support
+
+Add this package to the `package.json` dependencies list.
+
+```json
+{
+    "dependencies" : {
+        "react-native-share-extension": "git+https://github.com/klokt-valg/react-native-share-extension"
+    }
+}
+```
+
+Add to `Podfile` of iOS or MacOS project.
+
+```cocoapod
+target 'MyShareExt' do
+    pod 'ReactNativeShareExtension', :path => '../node_modules/react-native-share-extension'
+end
+```
+
+## MacOS Support
+
+This package supports [React-native for MacOS](https://github.com/Microsoft/react-native-macos), and can be used to create Share Extension on Mac OS X.
+
+The usage is similar to that of iOS usage, with the following additional steps.
+
+- Add what Xib file to load to `MyShareExt` class
+
+    ```obj-c
+    @implementation MyShareExt
+
+    - (NSString *)nibName {
+        return @"MyShareExt";
+    }
+
+    ```
+
+    Here make sure the string matches to the Xib file name you have in the project. The default one should be like `ShareViewController.xib`
+
+- Add App Capability (for Development & testing, at least).
+    Open project in XCode, and for each target, add & check:
+    `Sigining & Capabilities` -> `Add Capability` -> `App Sandbox` -> `Outgoing connections`.
+
+- Add `metro.config` for MacOS
+    The React Native for MacOS defines a new set of core React Native libraries by itself, and they will conflict with the original React Native libraries. We should let the Metro packager know to use different core libraries.
+
+    ```javascript
+    // metro.config.macos.js
+
+    /**
+     * This cli config is needed for development purposes, e.g. for
+     * running integration tests during local development or on
+     * CI services.
+     */
+    const path = require('path');
+    const blacklist = require('metro-config/src/defaults/blacklist');
+
+    const rnmPath = path.resolve(__dirname, 'node_modules/react-native-macos');
+
+    module.exports = {
+        resolver: {
+            extraNodeModules: {
+            'react-native': rnmPath,
+            },
+            platforms: ['ios', 'android', 'web', 'macos'],
+            blacklistRE: blacklist([
+            /node_modules\/react-native\/.*/
+            ]),
+        },
+    };
+    ```
+
+- Add shortcut script to `package.json` (Optional)
+
+    ```json
+    {
+        "scripts": {
+            "macos": "react-native-macos run-macos",
+        }
+    }
+    ```
+    
